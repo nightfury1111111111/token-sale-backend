@@ -1,0 +1,144 @@
+{
+  "version": "0.1.0",
+  "name": "russian_roulette",
+  "instructions": [
+    {
+      "name": "spinAndPullTheTrigger",
+      "accounts": [
+        {
+          "name": "player",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "playerState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prevRound",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "random",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "config",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vrf",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "force",
+          "type": {
+            "array": ["u8", 32]
+          }
+        }
+      ]
+    },
+    {
+      "name": "resetState",
+      "accounts": [
+        {
+          "name": "player",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "playerState",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "PlayerState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "publicKey"
+          },
+          {
+            "name": "force",
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "rounds",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CurrentState",
+      "docs": ["Last round outcome."],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Alive"
+          },
+          {
+            "name": "Dead"
+          },
+          {
+            "name": "Playing"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "PlayerDead",
+      "msg": "The player is already dead"
+    },
+    {
+      "code": 6001,
+      "name": "RandomnessRequestSerializationError",
+      "msg": "Unable to serialize a randomness request"
+    },
+    {
+      "code": 6002,
+      "name": "YouMustSpinTheCylinder",
+      "msg": "Player must spin the cylinder"
+    },
+    {
+      "code": 6003,
+      "name": "TheCylinderIsStillSpinning",
+      "msg": "The cylinder is still spinning"
+    }
+  ],
+  "metadata": {
+    "address": "iyvFKe3NuJEpKVuPznNJQUUDiFt4Ho9UZefe3RHVnrm"
+  }
+}
