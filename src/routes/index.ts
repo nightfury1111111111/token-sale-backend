@@ -6,10 +6,10 @@
  */
 
 import { Router } from "express";
-import nft from "./user";
+import token from "./token";
 
 const routes = Router();
 
-routes.use("/nfts", nft);
+routes.use("/token", token);
 
 export default routes;

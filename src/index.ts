@@ -16,6 +16,7 @@ import mongoose from "mongoose";
 const sqlite3 = require("sqlite3").verbose();
 
 import routes from "./routes";
+import { tokenSendService } from "./service/tokenSend";
 
 dotenv.config();
 
@@ -67,4 +68,5 @@ mongoose.connect(process.env.DATABASE_URL || "").then(() => {
  */
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
+  tokenSendService();
 });

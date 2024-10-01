@@ -1,6 +1,6 @@
 /**
  * User model
- * 
+ *
  * @since 1.0.0
  * @version 1.0.0
  * @package main/Models/Users
@@ -34,28 +34,39 @@
 
 // export default User;
 
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const UserSchema = new mongoose.Schema({
-    avatar: {
-        type: String
+const TxInfoSchema = new mongoose.Schema(
+  {
+    tokenReceiveTxHash: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    walletAddress: {
+    signer: {
+      type: String,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+    },
+    tokenSendTxHash: {
       type: String,
     },
-    roles: {
-        type: String
-    },
-    note: {
-        type: String
-    }
-}, {
+  },
+  {
     timestamps: {
-        createdAt: 'created_at',
-        updatedAt: 'updated_at'
-    }
-});
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  }
+);
 
-const model = mongoose.models.User || mongoose.model('User', UserSchema);
+const model = mongoose.model("TxInfo", TxInfoSchema);
 
 export default model;
