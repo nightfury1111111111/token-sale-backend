@@ -45,11 +45,9 @@ const TxInfoSchema = new mongoose.Schema(
     },
     signer: {
       type: String,
-      required: true,
     },
     amount: {
       type: Number,
-      required: true,
     },
     status: {
       type: String,
