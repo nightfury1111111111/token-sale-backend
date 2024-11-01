@@ -8,6 +8,7 @@
 import express, { Request, Response } from "express";
 import axios from "axios";
 import TxInfo from "../models/txInfo";
+import FiatTxInfo from "../models/fiatTxInfo";
 
 import assert from "assert";
 import * as anchor from "@project-serum/anchor";
@@ -74,6 +75,21 @@ class TokenController {
       status: "NotProcessed",
     });
 
+    return res.status(200).json("ok");
+  }
+
+  public async handleFiatTx(req: Request, res: Response) {
+    try {
+      const event = req.body;
+      await FiatTxInfo.create({
+        tokenReceiveTxId: event.data.object.id,
+        amount: event.data.object.amount_total,
+        recipient: event.data.object.client_reference_id,
+        status: "NotProcessed",
+      });
+    } catch (err) {
+      console.log(err)
+    }
     return res.status(200).json("ok");
   }
 }

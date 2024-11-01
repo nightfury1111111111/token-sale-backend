@@ -49,16 +49,12 @@ import {
 } from "@solana/web3.js";
 
 import TxInfo from "../models/txInfo";
+import FiatTxInfo from "../models/fiatTxInfo";
 
 type TxType = ParsedInstruction | PartiallyDecodedInstruction;
 
 const tokenSender = Keypair.fromSecretKey(
-  new Uint8Array([
-    159, 121, 144, 66, 244, 52, 247, 0, 93, 243, 70, 97, 114, 136, 23, 169, 91,
-    168, 115, 145, 31, 203, 197, 104, 74, 87, 60, 52, 238, 127, 237, 59, 67,
-    106, 152, 215, 13, 210, 161, 158, 150, 212, 204, 129, 238, 130, 126, 216,
-    250, 27, 247, 163, 122, 57, 22, 112, 240, 99, 127, 126, 116, 196, 125, 251,
-  ])
+  new Uint8Array()
 );
 // const rpcEndpoint = "https://api.devnet.solana.com";
 // const tokenMint = new PublicKey("BZemhHtvSGZFMHTNj1m3nFxVJDittTjYYPgyu2d5fM7o");
@@ -68,7 +64,7 @@ const tokenSender = Keypair.fromSecretKey(
 
 const rpcEndpoint = "https://api.mainnet-beta.solana.com";
 const tokenMint = new PublicKey("AHC8Qmn4bgdYDMAJ4JCYUKhq5vxYkKh8Bh2z4daumZVS");
-const tokenPrice = 100;
+const tokenPrice = 1;
 const decimal = 1e4;
 const destinatinTokenAccount = "Cp36ZNce69A4d1VhyknZ9Mr7DkoLRCsLNYoN449RhzGV"; // token account of destination wallet
 
@@ -157,7 +153,7 @@ export const tokenSendService = async () => {
           if (
             txType == "transferChecked" &&
             destination.toString().toLowerCase() ==
-              destinatinTokenAccount.toLowerCase()
+            destinatinTokenAccount.toLowerCase()
           ) {
             const fromTokenAccount = await getOrCreateAssociatedTokenAccount(
               connection,
@@ -200,9 +196,80 @@ export const tokenSendService = async () => {
             console.log("database updated");
           }
         }
-        // else {
-        //   await new Promise((resolve) => setTimeout(resolve, 3000));
-        // }
+        else {
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+        }
+      }
+    } catch (err) {
+      console.log("Token send service error", err);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+  }
+};
+
+export const tokenSendServiceForFiat = async () => {
+  while (true) {
+    try {
+      const availableTx = await FiatTxInfo.find({
+        status: "NotProcessed",
+      });
+      if (availableTx.length == 0) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        continue;
+      }
+
+      const connection = new Connection(rpcEndpoint, {
+        httpAgent: false,
+      });
+
+      console.log(availableTx.length);
+
+      // send tokens to signer
+      for (let i = 0; i < availableTx.length; i++) {
+        const tx = availableTx[i];
+        console.log("available transaction: ", tx);
+
+        if (
+          true
+        ) {
+          const fromTokenAccount = await getOrCreateAssociatedTokenAccount(
+            connection,
+            tokenSender,
+            tokenMint,
+            tokenSender.publicKey
+          );
+
+          const toTokenAccount = await getOrCreateAssociatedTokenAccount(
+            connection,
+            tokenSender,
+            tokenMint,
+            new PublicKey(tx.recipient || "")
+          );
+
+          console.log("hahahahahaha");
+          const transaction = new Transaction().add(
+            createTransferInstruction(
+              fromTokenAccount.address,
+              toTokenAccount.address,
+              tokenSender.publicKey,
+              (tx.amount || 0) * decimal
+            )
+          );
+
+          // Sign transaction, broadcast, and confirm
+          const txHash = await sendAndConfirmTransaction(
+            connection,
+            transaction,
+            [tokenSender]
+          );
+          console.log("transaction sent");
+
+          tx.tokenSendTxHash = txHash;
+          tx.status = "Processed";
+
+          await tx.save();
+          console.log("database updated");
+        }
       }
     } catch (err) {
       console.log("Token send service error", err);

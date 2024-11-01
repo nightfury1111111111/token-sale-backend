@@ -14,5 +14,6 @@ const token = new TokenController();
 
 router.get("/test", token.test);
 router.post("/send", token.send);
+router.post("/webhook", token.handleFiatTx);
 
 export default router;
